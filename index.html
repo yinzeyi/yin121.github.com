@@ -3,69 +3,138 @@
 <head>
     <meta charset="UTF-8">
     <title></title>
-    <style>
-        body {
-            margin-right: 20%;
-            margin-left: 20%;
-            background-color: beige;
-            border: 1px dotted gainsboro;
-            padding: 10px 10px 10px 10px;
-        }
-        h1{
-            text-align: center;
-            font-family: "楷体";
-            color: brown;
-
-        }
-        h2{
-            font-size: 15px;
-            text-align: right;
-            font-family: "楷体";
-        }
-
-        span{
-            color: azure;
-            font-family: "楷体";
-
-        }
-        p{
-            text-indent: 2em;
-            line-height: 1.5em;
-            font-size: 16px;
-            font-family: "宋体";
-            font-weight: bold;
-           /* margin: 2px;*/
-        }
-        div{
-            text-align: center;
-
-        }
-    </style>
 </head>
 <body>
-<h1>
-<span> 倾情表白</span>我只是<span>足够的爱你</span>
+<canvas id="canvas" width="400" height="600"></canvas>
+<script>
+    var canvas = document.getElementById('canvas').getContext("2d");
+    //获取canvas标签2d效果
+    var niao1 = new Image();
+    //创建叫niao1的新图片
+    var j = 0;
+    var imgSrcArr = ["0.gif", "1.gif", "2.gif"];
+    //创建一个数组
+    var downPipeHeight = 200;
+    var img1 = new Image();
+    img1.src = "ground.png";
+    var img = new Image();
+    img.src = 'pipe.png';
+    var upPipeX = 400;
+    var dowPipeX = 400;
+    var img2 = new Image();
+    img2.src = 'pipe1.png';
+    var dowPipey = 400;
+    var upPipeHeight = 200;
+    var niao1y = 250;
+    var v2;
+    var v1 = 10;
+    var a = 2;
+    var s = 0;
+    var niaox = 150;
+    var velocity = 10;
+//    var isScore = false;
+    //    var xiaoniancishu = 0;
+    //    var result = 0;
+    //    var ctx;
+    var score = 0;
+    var str = "game over";
+    var top;
+    //    var isSorce = true;
+//    top = prompt("请输入难度等级");
+    var timer = setInterval(function () {
+
+
+        canvas.clearRect(0, 0, 400, 600);
+        niao1.src = "bg.png";
+        canvas.drawImage(niao1, 0, 0, 400, 600);
+        ////在canvas里根据参数画出背景图片
+        j++;
+        j = j % 3;
+        //获取i变量
+        niao1.src = imgSrcArr[j];
+        //根据i变量不停切换鸟的图片
+        canvas.drawImage(niao1, niaox, niao1y, 40, 40);
+        //在canvas里根据参数画出nian1
+        v2 = v1 + a;
+        s = (v1 + v2) / 2;
+//        v1 = v2;
+        niao1y += s;
+        upPipeX = upPipeX - 3;
+        dowPipeX = dowPipeX - 3;
+
+        if (upPipeX < -100) {
+            upPipeX = 400;
+            dowPipeX = 400;
+            upPipeHeight = 100 + 200 * Math.random();
+            dowPipey = upPipeHeight + 200;
+            downPipeHeight = 500 - dowPipey;
+//            isSorce = true;
+
+        }
+//        if (/*isScore &&*/ 100 > upPipeX + 100) {
+//            score ++;
+////            isScore = false;
+//
+////            if (score > 0 && score % 10 === 0) {
+////                velocity++;
+////            }
+//        }
+        if ( 100 == upPipeX ) {
+//////
+            score++;
+            console.log(score);
+        }
+
+//         //   isSorce = false;
+//            canvas.fillStyle = "rgb(255,255,255)";
+//            canvas.font = "30px Accent";
+//            canvas.fillText(score, 140, 120);
+////
+////
+//    }
+
+    //        canvas.fillStyle = "rgb(255,255,255)";
+    //        canvas.font = "30px  Accent";
+    //        if (score>0) {
+    //            score.fillText(score,180,100);
+    //     }
+
+
+    canvas.drawImage(img2, 0, 500, 150, 500, dowPipeX, dowPipey, 100, downPipeHeight);
+    canvas.drawImage(img, 150, 500, 150, 800, upPipeX, 0, 100, upPipeHeight);
+    canvas.drawImage(img1, 0, 500, 400, 200);
+        canvas.fillStyle = "rgb(255,255,255)";
+        canvas.font = "30px Accent";
+        canvas.fillText(score, 180, 120);
+    if ((niao1y + 40 > 500 || niao1y < 0)
+            || (190 > upPipeX) && (niao1y < upPipeHeight) && (niaox < upPipeX + 100 ) && ( niao1y < upPipeHeight)
+            || (190 > dowPipeX) && (niao1y + 40 > dowPipey) && (niaox < dowPipeX + 100) && (niao1y + 40 > dowPipey)) {
+        clearInterval(timer);
+           canvas.fillStyle = "rgb(255,255,255)";
+           canvas.font = "30px Accent";
+            canvas.fillText("你的通过次数", 100, 80);
+        canvas.fillText("再来一局",120,160);
+
+
+    };}, 80);
+    // a =  (Math.random()*200+200);
+    //  b =  ((600 - a )-100);
+
+    window.onkeydown = function (event) {
+        var e = event || window.event;
+        if (e.keyCode == 32) {
+            niao1y -= 80;
+
+        }
+    }
+
+    img1.src = "ground.png";
+    niao1.src = "bg.png";
+    canvas.drawImage(niao1, 0, 0, 400, 600);
+    //重新画一副背景
 
 
 
-</h1>
-
-<h2>
-    爱哭的毛毛虫&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;
-</h2>
-
-<p>原谅我的文字没有别人的华丽，但是我的心，却很真。看了你的文字让我心疼，请你，对自己好点。少抽烟，少喝酒，少吃辣多休息，不知道怎么搞的，想了好多话，但写起来变词穷了，阿呆我爱你，你知道吗?</p>
-<div><img src="qs4.jpg" width="" height=""   alt=""/></div>
-
-　　<p>我并不是对所有人都这么细心的女子，其实现实中的我并不是个温柔的女孩子，仅仅只有和他，我生命中最重要的他在一起时我才会变得淑女，变得有女人味。</p>
-<div><img src="qs2.jpg"  width="" height="" alt=""/></div>
-　　<p>你每次给我打电话说的最多的是你之前那个她，你可知道我听后的感受?我是要在乎还是装着不在乎?太多的情绪，却一直只有一种表情，其实我是个脆弱的人，亦或许我在伪装吧，亦或许那种坚强已成为一种习惯。</p>
-<div><img src="qs51.png"   width="" height=""alt=""/></div>
-
-　　<p>若，你看到的我，不止表面的我那多好。</p>
-<div><img src="qs7.jpg" width="" height=""/></div>
-　　<p>若，你能给我平淡的生活那多好。</p>
-<div><img src="qs6.jpg"  width="" height=""alt=""/></div>
-　　<p>你若不离，我定不弃，可是我知道这或许只是自己的想法，你每次电话中关于她的话题，每次通话都狠狠击碎了我所有的梦。真想在一个阳光灿烂的日子，站在你面前轻声喊你的名字，阿呆我不敢奢求你忘记前女友，但我希望你能慢慢接受我的爱。</p>
+</script>
 </body>
 </html>

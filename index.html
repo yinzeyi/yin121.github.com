@@ -1,140 +1,173 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <title></title>
+	<title>Flappy Bird</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<script type="text/javascript">
+		// Edit by xingoo
+		// Fork on my github:https://github.com/xinghalo/CodeJS/tree/master/HTML5
+		var ctx;
+		var cwidth = 400;
+		var cheight = 600;
+		var objects = [];
+		var birdIndex = 0;
+		var ver1 = 10;
+		var ver2;
+		var gravity = 2;
+		var pipe_height = 200;
+		var velocity = 10;
+		var tid;
+		var score = 0;
+		var isScore = false;
+
+		var birds = ["./images/0.gif","./images/1.gif","./images/2.gif"];
+
+		var back = new Background(0,0,400,600,"./images/bg.png");
+		var up_pipe = new UpPipe(0,0,100,200,"./images/pipe.png");
+		var down_pipe = new DownPipe(0,400,100,200,"./images/pipe.png");
+		var ground = new Background(0,550,400,200,"./images/ground.png");
+		var bird = new Bird(80,300,40,40,birds);
+
+		objects.push(back);
+		objects.push(up_pipe);
+		objects.push(down_pipe);
+		objects.push(ground);
+		objects.push(bird);
+
+		function UpPipe(x,y,width,height,img_src){
+			this.px = x;
+			this.py = y;
+			this.pwidth = width;
+			this.pheight = height;
+			this.img_src = img_src;
+			this.draw = drawUpPipe;
+		}
+
+		function DownPipe(x,y,width,height,img_src){
+			this.px = x;
+			this.py = y;
+			this.pwidth = width;
+			this.pheight = height;
+			this.img_src = img_src;
+			this.draw = drawDownPipe;
+		}
+
+		function drawUpPipe(){
+			var image = new Image();
+			image.src = this.img_src;
+			ctx.drawImage(image,150,500,150,800,this.px,this.py,this.pwidth,this.pheight);
+		}
+
+		function drawDownPipe(){
+			var image = new Image();
+			image.src = this.img_src;
+			ctx.drawImage(image,0,500,150,500,this.px,this.py,this.pwidth,this.pheight);
+		}
+
+		function Background(x,y,width,height,img_src){
+			this.bgx = x;
+			this.bgy = y;
+			this.bgwidth = width;
+			this.bgheight = height;
+			var image = new Image();
+			image.src = img_src;
+			this.img = image;
+			this.draw = drawbg;
+		}
+
+		function drawbg(){
+			ctx.drawImage(this.img,this.bgx,this.bgy,this.bgwidth,this.bgheight);
+		}
+
+		function Bird(x,y,width,height,img_srcs){
+			this.bx = x;
+			this.by = y;
+			this.bwidth = width;
+			this.bheight = height;
+			this.imgs = img_srcs;
+			this.draw = drawbird;
+		}
+
+		function drawbird(){
+			birdIndex++;
+			var image = new Image();
+			image.src = this.imgs[birdIndex%3];
+			ctx.drawImage(image,this.bx,this.by,this.bwidth,this.bheight);
+		}
+
+		function calculator(){
+			if(bird.by+bird.bheight>ground.bgy ||
+				((bird.bx+bird.bwidth>up_pipe.px)&&(bird.by>up_pipe.py)&&(bird.bx+bird.bwidth<up_pipe.px+up_pipe.pwidth)&&(	bird.by<up_pipe.py+up_pipe.pheight))||
+				((bird.bx+bird.bwidth>up_pipe.px)&&(bird.by>up_pipe.py)&&(bird.bx+bird.bwidth<up_pipe.px+up_pipe.pwidth)&&(	bird.by<up_pipe.py+up_pipe.pheight))||
+				((bird.bx>down_pipe.px)&&(bird.by>down_pipe.py)&&(bird.bx<down_pipe.px+down_pipe.pwidth)&&(bird.by<down_pipe.py+down_pipe.pheight))||
+				((bird.bx>down_pipe.px)&&(bird.by+bird.bheight>down_pipe.py)&&(bird.bx<down_pipe.px+down_pipe.pwidth)&&(bird.by+bird.bheight<down_pipe.py+down_pipe.pheight))){
+				clearInterval(tid);
+				ctx.fillStyle = "rgb(255,255,255)";
+				ctx.font = "30px Accent";
+				ctx.fillText("You got "+score+"!",110,100)
+				return;
+			}
+
+			ver2 = ver1+gravity;
+			bird.by += (ver2+ver1)*0.5;
+
+			if(up_pipe.px+up_pipe.pwidth>0){
+				up_pipe.px -= velocity;
+				down_pipe.px -= velocity;
+			}else{
+				up_pipe.px = 400;
+				down_pipe.px = 400;
+				up_pipe.pheight = 100+Math.random()*200;
+				down_pipe.py = up_pipe.pheight+pipe_height;
+				down_pipe.pheight = 600-down_pipe.py;
+				isScore = true;
+			}
+
+			if(isScore && bird.bx>up_pipe.px+up_pipe.pwidth){
+				score += 1;
+				isScore = false;
+				if(score>0 && score%10 === 0){
+					velocity++;
+				}
+			}
+
+			ctx.fillStyle = "rgb(255,255,255)";
+			ctx.font = "30px Accent";
+			if(score>0){
+				score%10!==0?ctx.fillText(score,180,100):ctx.fillText("Great!"+score,120,100);
+			}
+		}
+
+		function drawall(){
+			ctx.clearRect(0,0,cwidth,cheight);
+			var i;
+			for(i=0;i<objects.length;i++){
+				objects[i].draw();
+			}
+			calculator();
+		}
+
+		function keyup(e){
+		    var e = e||event;
+		   	var currKey = e.keyCode||e.which||e.charCode;
+	       	switch (currKey){
+		    	case 32:
+		    		bird.by -= 80;
+				    break;
+		    }
+		}	
+
+		function init(){
+			ctx = document.getElementById('canvas').getContext('2d');
+			document.onkeyup = keyup;
+			drawall();
+			tid = setInterval(drawall,80);
+		}
+	</script>
 </head>
-<body>
-<canvas id="canvas" width="400" height="600"></canvas>
-<script>
-    var canvas = document.getElementById('canvas').getContext("2d");
-    //获取canvas标签2d效果
-    var niao1 = new Image();
-    //创建叫niao1的新图片
-    var j = 0;
-    var imgSrcArr = ["0.gif", "1.gif", "2.gif"];
-    //创建一个数组
-    var downPipeHeight = 200;
-    var img1 = new Image();
-    img1.src = "ground.png";
-    var img = new Image();
-    img.src = 'pipe.png';
-    var upPipeX = 400;
-    var dowPipeX = 400;
-    var img2 = new Image();
-    img2.src = 'pipe1.png';
-    var dowPipey = 400;
-    var upPipeHeight = 200;
-    var niao1y = 250;
-    var v2;
-    var v1 = 10;
-    var a = 2;
-    var s = 0;
-    var niaox = 150;
-    var velocity = 10;
-//    var isScore = false;
-    //    var xiaoniancishu = 0;
-    //    var result = 0;
-    //    var ctx;
-    var score = 0;
-    var str = "game over";
-    var top;
-    //    var isSorce = true;
-//    top = prompt("请输入难度等级");
-    var timer = setInterval(function () {
-
-
-        canvas.clearRect(0, 0, 400, 600);
-        niao1.src = "bg.png";
-        canvas.drawImage(niao1, 0, 0, 400, 600);
-        ////在canvas里根据参数画出背景图片
-        j++;
-        j = j % 3;
-        //获取i变量
-        niao1.src = imgSrcArr[j];
-        //根据i变量不停切换鸟的图片
-        canvas.drawImage(niao1, niaox, niao1y, 40, 40);
-        //在canvas里根据参数画出nian1
-        v2 = v1 + a;
-        s = (v1 + v2) / 2;
-//        v1 = v2;
-        niao1y += s;
-        upPipeX = upPipeX - 3;
-        dowPipeX = dowPipeX - 3;
-
-        if (upPipeX < -100) {
-            upPipeX = 400;
-            dowPipeX = 400;
-            upPipeHeight = 100 + 200 * Math.random();
-            dowPipey = upPipeHeight + 200;
-            downPipeHeight = 500 - dowPipey;
-//            isSorce = true;
-
-        }
-//        if (/*isScore &&*/ 100 > upPipeX + 100) {
-//            score ++;
-////            isScore = false;
-//
-////            if (score > 0 && score % 10 === 0) {
-////                velocity++;
-////            }
-//        }
-        if ( 100 == upPipeX ) {
-//////
-            score++;
-            console.log(score);
-        }
-
-//         //   isSorce = false;
-//            canvas.fillStyle = "rgb(255,255,255)";
-//            canvas.font = "30px Accent";
-//            canvas.fillText(score, 140, 120);
-////
-////
-//    }
-
-    //        canvas.fillStyle = "rgb(255,255,255)";
-    //        canvas.font = "30px  Accent";
-    //        if (score>0) {
-    //            score.fillText(score,180,100);
-    //     }
-
-
-    canvas.drawImage(img2, 0, 500, 150, 500, dowPipeX, dowPipey, 100, downPipeHeight);
-    canvas.drawImage(img, 150, 500, 150, 800, upPipeX, 0, 100, upPipeHeight);
-    canvas.drawImage(img1, 0, 500, 400, 200);
-        canvas.fillStyle = "rgb(255,255,255)";
-        canvas.font = "30px Accent";
-        canvas.fillText(score, 180, 120);
-    if ((niao1y + 40 > 500 || niao1y < 0)
-            || (190 > upPipeX) && (niao1y < upPipeHeight) && (niaox < upPipeX + 100 ) && ( niao1y < upPipeHeight)
-            || (190 > dowPipeX) && (niao1y + 40 > dowPipey) && (niaox < dowPipeX + 100) && (niao1y + 40 > dowPipey)) {
-        clearInterval(timer);
-           canvas.fillStyle = "rgb(255,255,255)";
-           canvas.font = "30px Accent";
-            canvas.fillText("你的通过次数", 100, 80);
-        canvas.fillText("再来一局",120,160);
-
-
-    };}, 80);
-    // a =  (Math.random()*200+200);
-    //  b =  ((600 - a )-100);
-
-    window.onkeydown = function (event) {
-        var e = event || window.event;
-        if (e.keyCode == 32) {
-            niao1y -= 80;
-
-        }
-    }
-
-    img1.src = "ground.png";
-    niao1.src = "bg.png";
-    canvas.drawImage(niao1, 0, 0, 400, 600);
-    //重新画一副背景
-
-
-
-</script>
+<body onLoad="init();">
+<canvas id="canvas" width="400" height="600" style="margin-left:200px;">
+	Your browser is not support canvas! 
+</canvas>
 </body>
 </html>
